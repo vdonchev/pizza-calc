@@ -3,7 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#c83a2a">
+  <meta name="description" content="Бърз калкулатор за тесто за пица по базова рецепта с брашно, вода, морска сол и прясна мая.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Пицата">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Пицата на Дончев</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" href="icons/pizza-icon.svg" type="image/svg+xml">
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <style>
     :root {
       --cream: #fff6e6;
@@ -55,6 +66,57 @@
       gap: 18px;
       min-height: 100vh;
       padding: 36px 18px;
+    }
+
+    .install-prompt {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: min(1080px, 100%);
+      padding: 12px 14px 12px 18px;
+      border: 1px solid rgba(200, 58, 42, 0.18);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 250, 239, 0.86);
+      box-shadow: 0 14px 34px rgba(64, 34, 19, 0.12);
+      backdrop-filter: blur(14px);
+    }
+
+    .install-prompt.is-visible {
+      display: flex;
+    }
+
+    .install-prompt p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
+    .install-prompt strong {
+      color: var(--tomato-dark);
+      font-weight: 950;
+    }
+
+    .install-button {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 16px;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--tomato), var(--tomato-dark));
+      box-shadow: 0 10px 22px rgba(200, 58, 42, 0.22);
+      cursor: pointer;
+    }
+
+    .install-button:focus-visible {
+      outline: 3px solid rgba(200, 58, 42, 0.32);
+      outline-offset: 3px;
     }
 
     .app {
@@ -406,6 +468,16 @@
     }
 
     @media (max-width: 520px) {
+      .install-prompt {
+        align-items: stretch;
+        flex-direction: column;
+        border-radius: 22px;
+      }
+
+      .install-button {
+        width: 100%;
+      }
+
       .content {
         padding: 18px;
       }
@@ -437,6 +509,11 @@
 </head>
 <body>
   <main>
+    <div class="install-prompt" id="installPrompt" hidden>
+      <p><strong>Инсталирай приложението</strong> за бърз достъп и работа офлайн.</p>
+      <button class="install-button" id="installApp" type="button">Инсталирай</button>
+    </div>
+
     <section class="app" aria-labelledby="page-title">
       <div class="content">
         <div class="hero">
@@ -537,6 +614,27 @@
     const yeastOutput = document.querySelector("#yeast");
     const pizzaSizeOutput = document.querySelector("#pizzaSize");
     const currentYearOutput = document.querySelector("#currentYear");
+    const installPrompt = document.querySelector("#installPrompt");
+    const installAppButton = document.querySelector("#installApp");
+    let deferredInstallPrompt = null;
+
+    function isAppInstalled() {
+      return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    }
+
+    function showInstallPrompt() {
+      if (isAppInstalled() || deferredInstallPrompt === null) {
+        return;
+      }
+
+      installPrompt.hidden = false;
+      installPrompt.classList.add("is-visible");
+    }
+
+    function hideInstallPrompt() {
+      installPrompt.classList.remove("is-visible");
+      installPrompt.hidden = true;
+    }
 
     function formatGrams(value, decimals = 0) {
       const formattedValue = value.toLocaleString("bg-BG", {
@@ -603,8 +701,36 @@
     ballsInput.addEventListener("input", updateCalculator);
     ballWeightInput.addEventListener("input", updateCalculator);
     resetCalculatorButton.addEventListener("click", resetCalculator);
+    installAppButton.addEventListener("click", async () => {
+      if (deferredInstallPrompt === null) {
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      hideInstallPrompt();
+    });
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      showInstallPrompt();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      hideInstallPrompt();
+    });
+
     currentYearOutput.textContent = new Date().getFullYear();
     updateCalculator();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("service-worker.js");
+      });
+    }
   </script>
 </body>
 </html>

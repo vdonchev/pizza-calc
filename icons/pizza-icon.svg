@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Pizza icon">
+  <rect width="512" height="512" rx="112" fill="#fff6e6"/>
+  <circle cx="256" cy="256" r="206" fill="#c83a2a"/>
+  <circle cx="256" cy="256" r="176" fill="#f4d6a4"/>
+  <path fill="#f7c45c" d="M256 96a160 160 0 0 1 136 244H120A160 160 0 0 1 256 96Z"/>
+  <path fill="#982818" d="M118 339h276c-27 47-78 79-138 79s-111-32-138-79Z"/>
+  <circle cx="189" cy="207" r="27" fill="#c83a2a"/>
+  <circle cx="304" cy="181" r="25" fill="#c83a2a"/>
+  <circle cx="270" cy="286" r="29" fill="#c83a2a"/>
+  <circle cx="358" cy="278" r="22" fill="#c83a2a"/>
+  <path fill="#247a3d" d="M174 272c-24-3-42-20-49-43 25 2 43 16 49 43Zm181-60c-19-15-26-39-18-62 20 14 28 36 18 62Zm-119 134c-23 7-47 0-63-18 22-8 45-2 63 18Z"/>
+  <path fill="#fff6e6" fill-opacity=".45" d="M156 156c62-58 160-64 229-14-66-33-151-23-207 29-42 39-60 92-55 144-19-54-7-116 33-159Z"/>
+</svg>
