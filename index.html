@@ -102,7 +102,7 @@
       display: inline-flex;
       align-items: center;
       width: fit-content;
-      gap: 8px;
+      gap: 34px;
       margin: 0 0 18px;
       padding: 8px 12px;
       border: 1px solid rgba(36, 122, 61, 0.18);
@@ -116,12 +116,13 @@
     }
 
     .eyebrow::before {
+      flex: 0 0 auto;
       width: 9px;
       height: 9px;
       border-radius: 50%;
       content: "";
-      background: var(--tomato);
-      box-shadow: 12px 0 0 var(--basil), 24px 0 0 var(--olive);
+      background: var(--basil);
+      box-shadow: 12px 0 0 #fff, 24px 0 0 var(--tomato);
     }
 
     h1 {
@@ -338,14 +339,14 @@
       <div class="content">
         <div class="hero">
           <div>
-            <p class="eyebrow">Неаполитанско тесто</p>
+            <p class="eyebrow">Pizza Napoletana</p>
             <h1 id="page-title">Пицата на Дончев</h1>
-            <p class="subtitle">Бърз калкулатор за тесто по базова рецепта с брашно 00, студена вода, морска сол и прясна мая.</p>
+            <p class="subtitle">Бърз калкулатор за тесто по базова рецепта с брашно, студена вода, морска сол и прясна мая.</p>
           </div>
 
           <div class="recipe-note" aria-label="Базова рецепта">
             <strong>Базова рецепта</strong>
-            <span>1000 г брашно 00, 620 г вода, 30 г морска сол и 1.6 г прясна мая за 6 топки по около 270 г.</span>
+            <span>1000 г брашно, 620 г вода, 30 г морска сол и 1.6 г прясна мая за 6 топки по около 270 г.</span>
           </div>
         </div>
 
@@ -358,7 +359,7 @@
 
             <label for="ballWeight">
               Грамаж на топка
-              <input id="ballWeight" name="ballWeight" type="number" min="1" step="1" value="270" inputmode="numeric">
+              <input id="ballWeight" name="ballWeight" type="number" min="100" step="1" value="270" inputmode="numeric">
             </label>
           </div>
 
@@ -369,7 +370,7 @@
 
           <div class="results" aria-live="polite">
             <div class="ingredient">
-              <span class="ingredient-name"><span class="dot"></span>Брашно 00</span>
+              <span class="ingredient-name"><span class="dot"></span>Брашно</span>
               <output id="flour">1000 г</output>
             </div>
 
@@ -385,11 +386,10 @@
 
             <div class="ingredient">
               <span class="ingredient-name"><span class="dot yeast"></span>Прясна мая</span>
-              <output id="yeast">1.6 г</output>
+              <output id="yeast">1.60 г</output>
             </div>
           </div>
 
-          <p class="hint">Сметките използват 1620 г базово тесто, за да съвпадат с 6 топки по 270 г.</p>
         </form>
       </div>
     </section>
@@ -426,16 +426,17 @@
 
     function updateCalculator() {
       const balls = Math.max(1, Math.round(readPositiveNumber(ballsInput, 1)));
-      const ballWeight = readPositiveNumber(ballWeightInput, 270);
+      const ballWeight = Math.max(100, readPositiveNumber(ballWeightInput, 270));
       const totalDough = balls * ballWeight;
       const factor = totalDough / baseRecipe.totalDough;
 
       ballsInput.value = balls;
+      ballWeightInput.value = ballWeight;
       totalDoughOutput.value = formatGrams(totalDough);
       flourOutput.value = formatGrams(baseRecipe.flour * factor);
       waterOutput.value = formatGrams(baseRecipe.water * factor);
-      saltOutput.value = formatGrams(baseRecipe.salt * factor);
-      yeastOutput.value = formatGrams(baseRecipe.yeast * factor, 1);
+      saltOutput.value = formatGrams(baseRecipe.salt * factor, 2);
+      yeastOutput.value = formatGrams(baseRecipe.yeast * factor, 2);
     }
 
     ballsInput.addEventListener("input", updateCalculator);
