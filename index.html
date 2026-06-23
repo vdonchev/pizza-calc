@@ -209,6 +209,38 @@
       transform: translateY(-1px);
     }
 
+    input.is-invalid {
+      border-color: #d8291f;
+      color: #982818;
+      background: #fff0ed;
+      box-shadow: 0 0 0 5px rgba(216, 41, 31, 0.12);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: -4px;
+    }
+
+    .reset-link {
+      border: 0;
+      padding: 0;
+      color: var(--tomato-dark);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .reset-link:focus-visible {
+      outline: 3px solid rgba(200, 58, 42, 0.35);
+      outline-offset: 4px;
+      border-radius: 6px;
+    }
+
     .total {
       display: flex;
       align-items: end;
@@ -227,11 +259,20 @@
       font-weight: 800;
     }
 
+    .total-note {
+      margin: 6px 0 0;
+      opacity: 0.78;
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.35;
+    }
+
     .total output {
       font-size: clamp(34px, 5vw, 54px);
       font-weight: 950;
       line-height: 1;
       letter-spacing: -0.04em;
+      white-space: nowrap;
     }
 
     .results {
@@ -418,17 +459,24 @@
           <div class="controls">
             <label for="balls">
               Брой топки
-              <input id="balls" name="balls" type="number" min="1" step="1" value="6" inputmode="numeric">
+              <input id="balls" name="balls" type="number" min="1" max="100" step="1" value="6" inputmode="numeric">
             </label>
 
             <label for="ballWeight">
               Грамаж на топка
-              <input id="ballWeight" name="ballWeight" type="number" min="100" step="1" value="270" inputmode="numeric">
+              <input id="ballWeight" name="ballWeight" type="number" min="100" max="600" step="1" value="270" inputmode="numeric">
             </label>
           </div>
 
+          <div class="form-actions">
+            <button class="reset-link" id="resetCalculator" type="button">Нулирай</button>
+          </div>
+
           <div class="total">
-            <span>Общо тесто</span>
+            <div>
+              <span>Общо тесто</span>
+              <p class="total-note">Това е общото количество брашно и вода.</p>
+            </div>
             <output id="totalDough">1620 гр.</output>
           </div>
 
@@ -481,6 +529,7 @@
 
     const ballsInput = document.querySelector("#balls");
     const ballWeightInput = document.querySelector("#ballWeight");
+    const resetCalculatorButton = document.querySelector("#resetCalculator");
     const totalDoughOutput = document.querySelector("#totalDough");
     const flourOutput = document.querySelector("#flour");
     const waterOutput = document.querySelector("#water");
@@ -490,46 +539,70 @@
     const currentYearOutput = document.querySelector("#currentYear");
 
     function formatGrams(value, decimals = 0) {
-      return `${value.toLocaleString("bg-BG", {
+      const formattedValue = value.toLocaleString("bg-BG", {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
-      })} гр.`;
+      }).replace(",", ".");
+
+      return `${formattedValue} гр.`;
     }
 
-    function readPositiveNumber(input, fallback) {
+    function setInputValidity(input, isValid) {
+      input.classList.toggle("is-invalid", !isValid);
+      input.setAttribute("aria-invalid", String(!isValid));
+    }
+
+    function readValidatedNumber(input, min, max, shouldBeInteger = false) {
       const value = Number(input.value);
-      return Number.isFinite(value) && value > 0 ? value : fallback;
+      const isValid = input.value.trim() !== ""
+        && Number.isFinite(value)
+        && value >= min
+        && value <= max
+        && (!shouldBeInteger || Number.isInteger(value));
+
+      setInputValidity(input, isValid);
+      return isValid ? value : null;
     }
 
-    function clampInput(input, min, fallback, shouldRound = false) {
-      const value = readPositiveNumber(input, fallback);
-      input.value = shouldRound ? Math.max(min, Math.round(value)) : Math.max(min, value);
+    function showInvalidResults() {
+      totalDoughOutput.value = "—";
+      flourOutput.value = "—";
+      waterOutput.value = "—";
+      saltOutput.value = "—";
+      yeastOutput.value = "—";
+      pizzaSizeOutput.value = "—";
     }
 
     function updateCalculator() {
-      const balls = Math.max(1, Math.round(readPositiveNumber(ballsInput, 1)));
-      const ballWeight = Math.max(100, readPositiveNumber(ballWeightInput, 270));
+      const balls = readValidatedNumber(ballsInput, 1, 100, true);
+      const ballWeight = readValidatedNumber(ballWeightInput, 100, 600);
+
+      if (balls === null || ballWeight === null) {
+        showInvalidResults();
+        return;
+      }
+
       const totalDough = balls * ballWeight;
       const factor = totalDough / baseRecipe.totalDough;
+      const salt = baseRecipe.salt * factor;
 
       totalDoughOutput.value = formatGrams(totalDough);
       flourOutput.value = formatGrams(baseRecipe.flour * factor);
       waterOutput.value = formatGrams(baseRecipe.water * factor);
-      saltOutput.value = formatGrams(baseRecipe.salt * factor, 2);
+      saltOutput.value = formatGrams(salt, Number.isInteger(salt) ? 0 : 2);
       yeastOutput.value = formatGrams(baseRecipe.yeast * factor, 2);
       pizzaSizeOutput.value = `${Math.floor(baseRecipe.pizzaDiameter * Math.sqrt(ballWeight / baseRecipe.ballWeight))} см.`;
     }
 
+    function resetCalculator() {
+      ballsInput.value = "6";
+      ballWeightInput.value = "270";
+      updateCalculator();
+    }
+
     ballsInput.addEventListener("input", updateCalculator);
     ballWeightInput.addEventListener("input", updateCalculator);
-    ballsInput.addEventListener("blur", () => {
-      clampInput(ballsInput, 1, 1, true);
-      updateCalculator();
-    });
-    ballWeightInput.addEventListener("blur", () => {
-      clampInput(ballWeightInput, 100, 270);
-      updateCalculator();
-    });
+    resetCalculatorButton.addEventListener("click", resetCalculator);
     currentYearOutput.textContent = new Date().getFullYear();
     updateCalculator();
   </script>
