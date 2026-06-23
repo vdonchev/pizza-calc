@@ -345,8 +345,11 @@
           </div>
 
           <div class="recipe-note" aria-label="Базова рецепта">
-            <strong>Базова рецепта</strong>
-            <span>1000 г брашно, 620 г вода, 30 г морска сол и 1.6 г прясна мая за 6 топки по около 270 г.</span>
+            <strong>Базова рецепта за 6 топки по 270 гр.</strong>
+            <span>- 1000 гр. брашно</span>
+            <span>- 620 гр. вода</span>
+            <span>- 30 гр. морска сол</span>
+            <span>- 1.6 гр. прясна мая</span>
           </div>
         </div>
 
@@ -365,28 +368,28 @@
 
           <div class="total">
             <span>Общо тесто</span>
-            <output id="totalDough">1620 г</output>
+            <output id="totalDough">1620 гр.</output>
           </div>
 
           <div class="results" aria-live="polite">
             <div class="ingredient">
               <span class="ingredient-name"><span class="dot"></span>Брашно</span>
-              <output id="flour">1000 г</output>
+              <output id="flour">1000 гр.</output>
             </div>
 
             <div class="ingredient">
               <span class="ingredient-name"><span class="dot water"></span>Вода (студена)</span>
-              <output id="water">620 г</output>
+              <output id="water">620 гр.</output>
             </div>
 
             <div class="ingredient">
               <span class="ingredient-name"><span class="dot salt"></span>Морска сол</span>
-              <output id="salt">30 г</output>
+              <output id="salt">30 гр.</output>
             </div>
 
             <div class="ingredient">
               <span class="ingredient-name"><span class="dot yeast"></span>Прясна мая</span>
-              <output id="yeast">1.60 г</output>
+              <output id="yeast">1.60 гр.</output>
             </div>
           </div>
 
@@ -416,7 +419,7 @@
       return `${value.toLocaleString("bg-BG", {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
-      })} г`;
+      })} гр.`;
     }
 
     function readPositiveNumber(input, fallback) {
