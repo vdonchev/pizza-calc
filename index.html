@@ -50,7 +50,9 @@
 
     main {
       display: grid;
-      place-items: center;
+      align-content: center;
+      justify-items: center;
+      gap: 18px;
       min-height: 100vh;
       padding: 36px 18px;
     }
@@ -289,6 +291,47 @@
       line-height: 1.45;
     }
 
+    .pizza-size {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid rgba(36, 122, 61, 0.18);
+      border-radius: 22px;
+      color: var(--basil);
+      background: rgba(36, 122, 61, 0.08);
+    }
+
+    .pizza-size span {
+      font-weight: 900;
+    }
+
+    .pizza-size output {
+      color: var(--tomato-dark);
+      font-size: 28px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      color: rgba(32, 25, 23, 0.66);
+      font-size: 14px;
+      font-weight: 650;
+      text-align: center;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.46);
+    }
+
+    .footer-note .heart {
+      color: #d8291f;
+      font-size: 15px;
+    }
+
+    .footer-note strong {
+      color: var(--ink);
+      font-weight: 900;
+    }
+
     @media (max-width: 820px) {
       main {
         padding: 18px;
@@ -304,7 +347,20 @@
       }
 
       .hero {
-        gap: 22px;
+        display: contents;
+      }
+
+      .intro {
+        order: 1;
+      }
+
+      .panel {
+        order: 2;
+      }
+
+      .recipe-note {
+        order: 3;
+        max-width: none;
       }
     }
 
@@ -330,6 +386,11 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .pizza-size {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -338,7 +399,7 @@
     <section class="app" aria-labelledby="page-title">
       <div class="content">
         <div class="hero">
-          <div>
+          <div class="intro">
             <p class="eyebrow">Pizza Napoletana</p>
             <h1 id="page-title">Пицата на Дончев</h1>
             <p class="subtitle">Бърз калкулатор за тесто по базова рецепта с брашно, студена вода, морска сол и прясна мая.</p>
@@ -393,14 +454,25 @@
             </div>
           </div>
 
+          <div class="pizza-size">
+            <span>Размер на пицата</span>
+            <output id="pizzaSize">30 см.</output>
+          </div>
+
         </form>
       </div>
     </section>
+
+    <footer class="footer-note">
+      Made with <span class="heart" aria-label="love">♥</span> by <strong>donchev</strong> <span id="currentYear"></span>
+    </footer>
   </main>
 
   <script>
     const baseRecipe = {
       totalDough: 6 * 270,
+      ballWeight: 270,
+      pizzaDiameter: 30,
       flour: 1000,
       water: 620,
       salt: 30,
@@ -414,6 +486,8 @@
     const waterOutput = document.querySelector("#water");
     const saltOutput = document.querySelector("#salt");
     const yeastOutput = document.querySelector("#yeast");
+    const pizzaSizeOutput = document.querySelector("#pizzaSize");
+    const currentYearOutput = document.querySelector("#currentYear");
 
     function formatGrams(value, decimals = 0) {
       return `${value.toLocaleString("bg-BG", {
@@ -427,23 +501,36 @@
       return Number.isFinite(value) && value > 0 ? value : fallback;
     }
 
+    function clampInput(input, min, fallback, shouldRound = false) {
+      const value = readPositiveNumber(input, fallback);
+      input.value = shouldRound ? Math.max(min, Math.round(value)) : Math.max(min, value);
+    }
+
     function updateCalculator() {
       const balls = Math.max(1, Math.round(readPositiveNumber(ballsInput, 1)));
       const ballWeight = Math.max(100, readPositiveNumber(ballWeightInput, 270));
       const totalDough = balls * ballWeight;
       const factor = totalDough / baseRecipe.totalDough;
 
-      ballsInput.value = balls;
-      ballWeightInput.value = ballWeight;
       totalDoughOutput.value = formatGrams(totalDough);
       flourOutput.value = formatGrams(baseRecipe.flour * factor);
       waterOutput.value = formatGrams(baseRecipe.water * factor);
       saltOutput.value = formatGrams(baseRecipe.salt * factor, 2);
       yeastOutput.value = formatGrams(baseRecipe.yeast * factor, 2);
+      pizzaSizeOutput.value = `${Math.floor(baseRecipe.pizzaDiameter * Math.sqrt(ballWeight / baseRecipe.ballWeight))} см.`;
     }
 
     ballsInput.addEventListener("input", updateCalculator);
     ballWeightInput.addEventListener("input", updateCalculator);
+    ballsInput.addEventListener("blur", () => {
+      clampInput(ballsInput, 1, 1, true);
+      updateCalculator();
+    });
+    ballWeightInput.addEventListener("blur", () => {
+      clampInput(ballWeightInput, 100, 270);
+      updateCalculator();
+    });
+    currentYearOutput.textContent = new Date().getFullYear();
     updateCalculator();
   </script>
 </body>
