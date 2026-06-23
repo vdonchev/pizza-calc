@@ -1,17 +1,17 @@
-const CACHE_NAME = "pizza-pwa-v3";
+const CACHE_NAME = "pizza-pwa-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./favicon.ico",
-  "./icons/pizza-icon.svg",
-  "./icons/favicon-16x16.png",
-  "./icons/favicon-32x32.png",
-  "./icons/apple-touch-icon.png",
-  "./icons/icon-192.png",
-  "./icons/icon-512.png",
-  "./icons/maskable-icon-192.png",
-  "./icons/maskable-icon-512.png",
+  "./app-icons/pizza-icon.svg",
+  "./app-icons/favicon-16x16.png",
+  "./app-icons/favicon-32x32.png",
+  "./app-icons/apple-touch-icon.png",
+  "./app-icons/icon-192.png",
+  "./app-icons/icon-512.png",
+  "./app-icons/maskable-icon-192.png",
+  "./app-icons/maskable-icon-512.png",
 ];
 
 self.addEventListener("install", (event) => {

@@ -2,7 +2,7 @@
 
 ## Project Shape
 - This is a single-page static app in `index.html`; CSS and JavaScript are inline.
-- The app is installable as a PWA via `manifest.webmanifest`, `service-worker.js`, `favicon.ico`, and icon assets under `icons/`.
+- The app is installable as a PWA via `manifest.webmanifest`, `service-worker.js`, `favicon.ico`, and icon assets under `app-icons/`.
 - Browser cache headers are declared for common static hosts in `.htaccess` and `_headers`.
 - No `README`, package manifest, lockfile, CI, tests, formatter, or build config is present. Do not invent npm/composer/etc. commands unless new config appears.
 
