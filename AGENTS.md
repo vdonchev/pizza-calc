@@ -3,6 +3,7 @@
 ## Project Shape
 - This is a single-page static app in `index.html`; CSS and JavaScript are inline.
 - The app is installable as a PWA via `manifest.webmanifest`, `service-worker.js`, `favicon.ico`, and icon assets under `icons/`.
+- Browser cache headers are declared for common static hosts in `.htaccess` and `_headers`.
 - No `README`, package manifest, lockfile, CI, tests, formatter, or build config is present. Do not invent npm/composer/etc. commands unless new config appears.
 
 ## App Logic
@@ -25,6 +26,8 @@
 - Keep `manifest.webmanifest` aligned with the app name, theme colors, and icon paths declared in `index.html`.
 - If adding or renaming static files required for offline use, update `APP_SHELL` and bump `CACHE_NAME` in `service-worker.js`.
 - If changing `index.html`, bump `CACHE_NAME` in `service-worker.js` so installed users receive the updated app shell.
+- Keep service worker navigations network-first with cached `index.html` fallback so production updates are seen while offline support remains.
+- Keep `index.html`, `manifest.webmanifest`, and `service-worker.js` on `Cache-Control: no-cache`; icons can use long-lived caching unless filenames are reused for changed artwork.
 - Required icon assets include SVG, ICO, 16x16/32x32 favicons, 180x180 Apple touch icon, 192x192/512x512 app icons, and 192x192/512x512 maskable icons.
 
 ## Verification
